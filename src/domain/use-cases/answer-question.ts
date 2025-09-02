@@ -1,15 +1,28 @@
-import { Answer } from "../entities/answer.js"
+import { Answer } from "../entities/answer.js";
+import type { AnswersRepository } from "../repositories/answers-repository.js";
 
-interface AnswerQuestionUseCaseRequest{
-    instructorId: string
-    questionId: string, 
-    content: string
+interface AnswerQuestionUseCaseRequest {
+  instructorId: string;
+  questionId: string;
+  content: string;
 }
 
-export class AnswerQuestionUseCase{
-    execute({instructorId, questionId, content}: AnswerQuestionUseCaseRequest){
-        const answer = new Answer(content)
+export class AnswerQuestionUseCase {
+  constructor(private answersRepository: AnswersRepository) {}
 
-        return answer
-    }
+  async execute({
+    instructorId,
+    questionId,
+    content,
+  }: AnswerQuestionUseCaseRequest) {
+    const answer = new Answer({
+      content,
+      authorId: instructorId,
+      questionId,
+    });
+
+    await this.answersRepository.create(answer);
+
+    return answer;
+  }
 }
